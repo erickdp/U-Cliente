@@ -11,7 +11,7 @@ public class Conexion {
     private static final String JDBC_USER = "root";
     private static final String JDBC_PASSWORD = "admin";
 
-    public static DataSource getDataSource() {
+    private static DataSource getDataSource() {
         BasicDataSource ds = new BasicDataSource();
         ds.setUrl(JDBC_URL);
         ds.setUsername(JDBC_USER);
