@@ -17,7 +17,7 @@ public class ServletControlador extends HttpServlet {
     /*
     El bloque de inicializacion estatico sirve para inicializar miembros de clase una sola vez y soluciona el problema de
     no poder hacerlo en los constructores, se ejecuta una sola vez y mas antes que cualquier constructor.
-    */
+     */
     static {
         TRANSACCION = new ClienteDaoJDBC();
     }
@@ -30,6 +30,11 @@ public class ServletControlador extends HttpServlet {
                 case "editar":
                     this.editarCliente(request, response);
                     break;
+
+                case "eliminar":
+                    this.eliminarCliente(request, response);
+                    break;
+
                 default:
                     accionDefault(request, response);
             }
@@ -46,6 +51,11 @@ public class ServletControlador extends HttpServlet {
                 case "insertar":
                     this.insertarCliente(request, response);
                     break;
+
+                case "modificar":
+                    this.modificarCliente(request, response);
+                    break;
+
                 default:
                     accionDefault(request, response);
             }
@@ -56,7 +66,6 @@ public class ServletControlador extends HttpServlet {
 
     private void accionDefault(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<Cliente> clientes = TRANSACCION.read();
-        System.out.println("clientes = " + clientes);
         HttpSession sesion = request.getSession();
         sesion.setAttribute("clientes", clientes);
         sesion.setAttribute("totalClientes", clientes.size());
@@ -101,11 +110,36 @@ public class ServletControlador extends HttpServlet {
         request.getRequestDispatcher(editarJSP).forward(request, response);
     }
 
+    private void modificarCliente(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int idCliente = Integer.parseInt(request.getParameter("idCliente"));
+        String nombreActualizado = request.getParameter("nombre");
+        String apellidoActualizado = request.getParameter("apellido");
+        String emailActualizado = request.getParameter("email");
+        String telefonoActualizado = request.getParameter("telefono");
+        double saldoActualizado = 0;
+        String saldoParametro = request.getParameter("saldo");
+        if (saldoParametro != null && !"".equals(saldoParametro)) {
+            saldoActualizado = Double.parseDouble(saldoParametro);
+        }
+
+        Cliente clienteActualizado = new Cliente(idCliente, nombreActualizado,
+                apellidoActualizado, emailActualizado, telefonoActualizado, saldoActualizado);
+
+        System.out.println("Registros alterados: " + TRANSACCION.update(clienteActualizado));
+        accionDefault(request, response);
+    }
+
     private double calcularSaldoTotal(List<Cliente> clientes) {
         double saldoTotal = 0;
         for (Cliente c : clientes) {
             saldoTotal += c.getSaldo();
         }
         return saldoTotal;
+    }
+
+    private void eliminarCliente(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int idCliente = Integer.parseInt(request.getParameter("idCliente"));
+        System.out.println("Registros alterados: " + TRANSACCION.delete(new Cliente(idCliente)));
+        accionDefault(request, response);
     }
 }

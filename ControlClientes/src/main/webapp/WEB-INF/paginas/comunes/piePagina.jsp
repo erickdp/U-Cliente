@@ -2,7 +2,7 @@
     <div class="container">
         <div class="col">
             <p class="lead text-center">
-                Copyright &copy; Erick E. D&iacute;az P. | Backend Developer
+                Copyright &copy; Erick E. D&iacute;az P. | <i class="fab fa-java"></i> Backend Developer
             </p>
         </div>
     </div>

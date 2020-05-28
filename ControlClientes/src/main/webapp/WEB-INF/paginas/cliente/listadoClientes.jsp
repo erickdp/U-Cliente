@@ -26,8 +26,10 @@
                             <!--Iteramos cada elemento de la lista de clientes-->
                             <c:forEach var="cliente" items="${clientes}">
                                 <tr>
+                                    <!--<td>${status.count}</td> El contador ya es los valores de tabla no el id-->
                                     <td>${cliente.id_cliente}</td>
                                     <td>${cliente.nombre} ${cliente.apellido}</td>
+                                    <!--currency por medio de la directiva se configura el precio-->
                                     <td><fmt:formatNumber value="${cliente.saldo}" type="currency" /></td>
                                     <td>
                                         <a href="${pageContext.request.contextPath}/ServletControlador?accion=editar&idCliente=${cliente.id_cliente}" 

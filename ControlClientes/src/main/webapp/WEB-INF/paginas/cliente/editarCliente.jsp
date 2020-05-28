@@ -9,7 +9,7 @@
         <!--Cabezero-->
         <jsp:include page="/WEB-INF/paginas/comunes/cabezero.jsp" />
 
-        <form action="${pageContext.request.contextPath}/ServletControlador?accion=modificar&idCliente=${cliente.id_cliente}"
+           <form action="${pageContext.request.contextPath}/ServletControlador?accion=modificar&idCliente=${cliente.id_cliente}"
               method="POST" class="was-validated">
             <!--Botones navegacion-->
             <jsp:include page="/WEB-INF/paginas/comunes/botonesNavegacionEdicion.jsp" />
