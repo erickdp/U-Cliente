@@ -1,5 +1,6 @@
 package web;
 
+import datos.CRUD;
 import datos.ClienteDaoJDBC;
 import dominio.Cliente;
 import java.io.IOException;
@@ -11,9 +12,30 @@ import javax.servlet.http.*;
 @WebServlet("/ServletControlador")
 public class ServletControlador extends HttpServlet {
 
+    private final static CRUD<Cliente> TRANSACCION;
+
+    /*
+    El bloque de inicializacion estatico sirve para inicializar miembros de clase una sola vez y soluciona el problema de
+    no poder hacerlo en los constructores, se ejecuta una sola vez y mas antes que cualquier constructor.
+    */
+    static {
+        TRANSACCION = new ClienteDaoJDBC();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        accionDefault(request, response);
+        String accion = request.getParameter("accion");
+        if (accion != null) {
+            switch (accion) {
+                case "editar":
+                    this.editarCliente(request, response);
+                    break;
+                default:
+                    accionDefault(request, response);
+            }
+        } else {
+            accionDefault(request, response);
+        }
     }
 
     @Override
@@ -33,7 +55,7 @@ public class ServletControlador extends HttpServlet {
     }
 
     private void accionDefault(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Cliente> clientes = new ClienteDaoJDBC().read();
+        List<Cliente> clientes = TRANSACCION.read();
         System.out.println("clientes = " + clientes);
         HttpSession sesion = request.getSession();
         sesion.setAttribute("clientes", clientes);
@@ -47,7 +69,6 @@ public class ServletControlador extends HttpServlet {
     }
 
     private void insertarCliente(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
 //        Se  recupera los valores de formulario
         String nombre = request.getParameter("nombre");
         String apellido = request.getParameter("apellido");
@@ -64,11 +85,20 @@ public class ServletControlador extends HttpServlet {
         Cliente cliente = new Cliente(nombre, apellido, email, telefono, saldo);
 
 //        Se lo inserta en la BBDD
-        int registrosModificados = new ClienteDaoJDBC().create(cliente);
+        int registrosModificados = TRANSACCION.create(cliente);
         System.out.println("registrosModificados = " + registrosModificados);
 
 //        Redirigimos hacia aacion por default
         accionDefault(request, response);
+    }
+
+    private void editarCliente(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int idCliente = Integer.parseInt(request.getParameter("idCliente"));
+        Cliente cliente = TRANSACCION.readByIdentifier(new Cliente(idCliente));
+        request.setAttribute("cliente", cliente);
+//        Como está en una carpeta oculta se tiene que usar ruta absoluta
+        String editarJSP = "/WEB-INF/paginas/cliente/editarCliente.jsp";
+        request.getRequestDispatcher(editarJSP).forward(request, response);
     }
 
     private double calcularSaldoTotal(List<Cliente> clientes) {

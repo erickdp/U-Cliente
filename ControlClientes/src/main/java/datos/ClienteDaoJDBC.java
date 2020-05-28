@@ -95,6 +95,9 @@ public class ClienteDaoJDBC implements CRUD<Cliente> {
             row = stmt.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
+        } finally {
+            Conexion.close(conn);
+            Conexion.close(stmt);
         }
         return row;
     }
@@ -110,8 +113,11 @@ public class ClienteDaoJDBC implements CRUD<Cliente> {
             stmt = conn.prepareStatement(SQL_SELECT_BY_ID);
             stmt.setInt(1, dtoObject.getId_cliente());
             rs = stmt.executeQuery();
-            rs.absolute(1); //Nos posicionamos en el primer registro de donde se encuentre el ID
-            clienteEncontrado = new Cliente(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getDouble(6));
+//            rs.absolute(1); Nos posicionamos en el primer registro de donde se encuentre el ID segun UDEMY pero no usar este metodo pues se cae
+            while (rs.next()) {
+                clienteEncontrado = new Cliente(rs.getInt(1), rs.getString(2),
+                        rs.getString(3), rs.getString(4), rs.getString(5), rs.getDouble(6));
+            }
         } catch (SQLException ex) {
             ex.printStackTrace(System.out);
         } finally {

@@ -10,14 +10,17 @@ public class Conexion {
             + "&useTimezone=true&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private static final String JDBC_USER = "root";
     private static final String JDBC_PASSWORD = "admin";
+    private static BasicDataSource dataSource; //Se la crea para no obtener 50 conexiones pool cada vez que se accede a la conexion
 
-    public static DataSource getDataSource() {
-        BasicDataSource ds = new BasicDataSource();
-        ds.setUrl(JDBC_URL);
-        ds.setUsername(JDBC_USER);
-        ds.setPassword(JDBC_PASSWORD);
-        ds.setInitialSize(50);
-        return ds;
+    private static DataSource getDataSource() {
+        if (dataSource == null) {
+            dataSource = new BasicDataSource();
+            dataSource.setUrl(JDBC_URL);
+            dataSource.setUsername(JDBC_USER);
+            dataSource.setPassword(JDBC_PASSWORD);
+            dataSource.setInitialSize(50);
+        }
+        return dataSource;
     }
 
     public static Connection getConnection() throws SQLException {
